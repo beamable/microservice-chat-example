@@ -241,5 +241,65 @@ namespace Beamable.Microservices
                 return new Response<List<MessageData>>(null, "Error retrieving room history");
             }
         }
+        
+         [ClientCallable]
+        public async Promise<Response<List<PlayerData>>> GetRoomMembers(string roomName)
+        {
+            try
+            {
+                var roomData = await Storage.GetByFieldName<RoomData, string>("roomName", roomName);
+                if (roomData == null)
+                {
+                    return new Response<List<PlayerData>>(null, "Room not found");
+                }
+
+                var members = new List<PlayerData>();
+                foreach (var gamerTag in roomData.memberGamerTags)
+                {
+                    var playerData = await Storage.GetByFieldName<PlayerData, long>("gamerTag", gamerTag);
+                    if (playerData != null)
+                    {
+                        members.Add(playerData);
+                    }
+                }
+
+                return new Response<List<PlayerData>>(members);
+            }
+            catch (Exception e)
+            {
+                BeamableLogger.LogError(e);
+                return new Response<List<PlayerData>>(null, "Error retrieving room members");
+            }
+        }
+
+        [ClientCallable]
+        public async Promise<Response<bool>> KickMember(long gamerTag, string roomName)
+        {
+            try
+            {
+                var roomData = await Storage.GetByFieldName<RoomData, string>("roomName", roomName);
+                if (roomData != null && roomData.memberGamerTags.Contains(gamerTag))
+                {
+                    roomData.memberGamerTags.Remove(gamerTag);
+                    if (roomData.memberGamerTags.Count == 0)
+                    {
+                        await Storage.Delete<BackendStorage, RoomData>(roomData.Id);
+                    }
+                    else
+                    {
+                        await Storage.Update(roomData.Id, roomData);
+                    }
+
+                    return new Response<bool>(true);
+                }
+
+                return new Response<bool>(false, "Member not found in the room");
+            }
+            catch (Exception e)
+            {
+                BeamableLogger.LogError(e);
+                return new Response<bool>(false, "Error kicking member");
+            }
+        }
     }
 }

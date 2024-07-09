@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ChatRooms.unity
     guid: b06e96afe9f8d9b48afd7b9f02bf84b5
+  - enabled: 1
+    path: Assets/Scenes/MembersScene.unity
+    guid: 0ae3b34d04806aa45a167efd5c69874f
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 2f2a4016e8699f643985cefdf358c1f4, type: 2}
