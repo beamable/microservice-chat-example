@@ -136,6 +136,32 @@ namespace Beamable.Server.Clients
             serializedFields.Add("roomName", raw_roomName);
             return this.Request<Beamable.Common.Utils.Response<System.Collections.Generic.List<Beamable.Common.Models.MessageData>>>("BackendRoomService", "GetRoomHistory", serializedFields);
         }
+        
+        /// <summary>
+        /// Call the GetRoomMembers method on the BackendRoomService microservice
+        /// <see cref="Beamable.Microservices.BackendRoomService.GetRoomMembers"/>
+        /// </summary>
+        public Beamable.Common.Promise<Beamable.Common.Utils.Response<System.Collections.Generic.List<Beamable.Common.Models.PlayerData>>> GetRoomMembers(string roomName)
+        {
+            object raw_roomName = roomName;
+            System.Collections.Generic.Dictionary<string, object> serializedFields = new System.Collections.Generic.Dictionary<string, object>();
+            serializedFields.Add("roomName", raw_roomName);
+            return this.Request<Beamable.Common.Utils.Response<System.Collections.Generic.List<Beamable.Common.Models.PlayerData>>>("BackendRoomService", "GetRoomMembers", serializedFields);
+        }
+        
+        /// <summary>
+        /// Call the KickMember method on the BackendRoomService microservice
+        /// <see cref="Beamable.Microservices.BackendRoomService.KickMember"/>
+        /// </summary>
+        public Beamable.Common.Promise<Beamable.Common.Utils.Response<bool>> KickMember(long gamerTag, string roomName)
+        {
+            object raw_gamerTag = gamerTag;
+            object raw_roomName = roomName;
+            System.Collections.Generic.Dictionary<string, object> serializedFields = new System.Collections.Generic.Dictionary<string, object>();
+            serializedFields.Add("gamerTag", raw_gamerTag);
+            serializedFields.Add("roomName", raw_roomName);
+            return this.Request<Beamable.Common.Utils.Response<bool>>("BackendRoomService", "KickMember", serializedFields);
+        }
     }
     
     internal sealed class MicroserviceParametersBackendRoomServiceClient

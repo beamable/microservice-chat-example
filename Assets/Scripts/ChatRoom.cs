@@ -160,4 +160,9 @@ public class ChatRoom : MonoBehaviour
         var roomMessage = $"{usernameResponse.data}: {message.content}";
         chatLogText.text += $"{roomMessage}\n";
     }
+
+    public void NavigateToMembers()
+    {
+        SceneManager.LoadScene("MembersScene");
+    }
 }
