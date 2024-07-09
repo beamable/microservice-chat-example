@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Beamable;
+using Beamable.Common.Models;
 using Beamable.Server.Clients;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ViewMembers : MonoBehaviour
+public class ManageRoomManager : MonoBehaviour
 {
     private string _roomName;
     private BeamContext _beamContext;
@@ -31,24 +31,27 @@ public class ViewMembers : MonoBehaviour
     private async Task LoadRoomMembers()
     {
         var response = await _backendService.GetRoomMembers(_roomName);
-        if (response.data.Count > 0)
+        if (response.data != null && response.data.Count > 0)
         {
             foreach (var member in response.data)
             {
                 var memberItem = Instantiate(memberItemPrefab, membersContainer);
                 var usernameText = memberItem.transform.Find("UsernameText").GetComponent<TMP_Text>();
                 var kickButton = memberItem.transform.Find("KickButton").GetComponent<Button>();
+                var banButton = memberItem.transform.Find("BanButton").GetComponent<Button>();
 
                 usernameText.text = member.avatarName;
 
                 if (member.gamerTag == _beamContext.PlayerId)
                 {
-                    // Disable or hide the kick button for the current user
+                    // Disable or hide the kick/ban buttons for the current user
                     kickButton.gameObject.SetActive(false);
+                    banButton.gameObject.SetActive(false);
                 }
                 else
                 {
                     kickButton.onClick.AddListener(() => KickMember(member.gamerTag, memberItem));
+                    banButton.onClick.AddListener(() => BanMember(member.gamerTag, memberItem));
                 }
             }
         }
@@ -71,8 +74,16 @@ public class ViewMembers : MonoBehaviour
         }
     }
 
-    public void GoBack()
+    private async void BanMember(long gamerTag, GameObject memberItem)
     {
-        SceneManager.LoadScene("ChatRoom");
+        var response = await _backendService.BanMember(gamerTag, _roomName);
+        if (response.data)
+        {
+            Destroy(memberItem);
+        }
+        else
+        {
+            Debug.LogError($"Error banning member: {response.errorMessage}");
+        }
     }
 }

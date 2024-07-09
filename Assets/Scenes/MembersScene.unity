@@ -366,7 +366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c28487089f3f34a48a0f2e3fdafb8ae6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  memberItemPrefab: {fileID: 2187612699850123415, guid: a6988c1f5b7abb84ba9b773abc47c074, type: 3}
+  memberItemPrefab: {fileID: 5371793268542881795, guid: eff88ff8f2bffa6439383af89be7a2d4, type: 3}
   membersContainer: {fileID: 778183237}
   roomTitle: {fileID: 2120656533}
 --- !u!1 &169187050

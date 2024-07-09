@@ -21,7 +21,7 @@ namespace Beamable.Microservices
             Debug.Log($"Sending notification with payload: {jsonPayload}");
             await Services.Notifications.NotifyPlayer(playerIds, context, jsonPayload);
         }
-        
+
         [ClientCallable]
         public async Promise<Response<string>> GetPlayerAvatarName(long gamerTag)
         {
@@ -104,7 +104,7 @@ namespace Beamable.Microservices
                 return new Response<bool>(false, "Error setting avatar name");
             }
         }
-        
+
         [ClientCallable]
         public async Promise<Response<bool>> JoinRoom(long gamerTag, string roomName)
         {
@@ -119,11 +119,14 @@ namespace Beamable.Microservices
                 }
                 else
                 {
-                    if (!roomData.memberGamerTags.Contains(gamerTag))
+                    if (roomData.bannedGamerTags.Contains(gamerTag))
                     {
-                        roomData.memberGamerTags.Add(gamerTag);
-                        await Storage.Update(roomData.Id, roomData);
+                        return new Response<bool>(false, "User is banned from this room");
                     }
+
+                    if (roomData.memberGamerTags.Contains(gamerTag)) return new Response<bool>(true);
+                    roomData.memberGamerTags.Add(gamerTag);
+                    await Storage.Update(roomData.Id, roomData);
                 }
 
                 return new Response<bool>(true);
@@ -242,7 +245,7 @@ namespace Beamable.Microservices
             }
         }
         
-         [ClientCallable]
+        [ClientCallable]
         public async Promise<Response<List<PlayerData>>> GetRoomMembers(string roomName)
         {
             try
@@ -299,6 +302,49 @@ namespace Beamable.Microservices
             {
                 BeamableLogger.LogError(e);
                 return new Response<bool>(false, "Error kicking member");
+            }
+        }
+
+        [ClientCallable]
+        public async Promise<Response<bool>> BanMember(long gamerTag, string roomName)
+        {
+            try
+            {
+                var roomData = await Storage.GetByFieldName<RoomData, string>("roomName", roomName);
+                if (roomData == null) return new Response<bool>(false, "Room not found");
+                if (!roomData.bannedGamerTags.Contains(gamerTag))
+                {
+                    roomData.bannedGamerTags.Add(gamerTag);
+                }
+
+                await Storage.Update(roomData.Id, roomData);
+                return new Response<bool>(true);
+
+            }
+            catch (Exception e)
+            {
+                BeamableLogger.LogError(e);
+                return new Response<bool>(false, "Error banning member");
+            }
+        }
+
+        [ClientCallable]
+        public async Promise<Response<bool>> UnbanMember(long gamerTag, string roomName)
+        {
+            try
+            {
+                var roomData = await Storage.GetByFieldName<RoomData, string>("roomName", roomName);
+                if (roomData == null || !roomData.bannedGamerTags.Contains(gamerTag))
+                    return new Response<bool>(false, "Member not found in the banned list");
+                roomData.bannedGamerTags.Remove(gamerTag);
+                await Storage.Update(roomData.Id, roomData);
+                return new Response<bool>(true);
+
+            }
+            catch (Exception e)
+            {
+                BeamableLogger.LogError(e);
+                return new Response<bool>(false, "Error unbanning member");
             }
         }
     }

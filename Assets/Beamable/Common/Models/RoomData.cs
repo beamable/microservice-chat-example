@@ -10,12 +10,14 @@ namespace Beamable.Common.Models
     {
         public string roomName;
         public List<long> memberGamerTags = new List<long>();
+        public List<long> bannedGamerTags = new List<long>(); 
         public List<MessageData> messages = new List<MessageData>();
 
         public void Set(RoomData document)
         {
             roomName = document.roomName;
             memberGamerTags = document.memberGamerTags;
+            bannedGamerTags = document.bannedGamerTags;
             messages = document.messages;
         }
     }
