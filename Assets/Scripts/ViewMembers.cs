@@ -5,9 +5,10 @@ using Beamable.Common.Models;
 using Beamable.Server.Clients;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ManageRoomManager : MonoBehaviour
+public class ViewMembers : MonoBehaviour
 {
     private string _roomName;
     private BeamContext _beamContext;
@@ -31,27 +32,39 @@ public class ManageRoomManager : MonoBehaviour
     private async Task LoadRoomMembers()
     {
         var response = await _backendService.GetRoomMembers(_roomName);
+        var blockedUsersResponse = await _backendService.GetBlockedUsers(_beamContext.PlayerId);
+
         if (response.data != null && response.data.Count > 0)
         {
+            var blockedUsers = new HashSet<long>(blockedUsersResponse.data);
+
             foreach (var member in response.data)
             {
+                if (blockedUsers.Contains(member.gamerTag))
+                {
+                    continue; // Skip blocked users
+                }
+
                 var memberItem = Instantiate(memberItemPrefab, membersContainer);
                 var usernameText = memberItem.transform.Find("UsernameText").GetComponent<TMP_Text>();
                 var kickButton = memberItem.transform.Find("KickButton").GetComponent<Button>();
                 var banButton = memberItem.transform.Find("BanButton").GetComponent<Button>();
+                var blockButton = memberItem.transform.Find("BlockButton").GetComponent<Button>();
 
                 usernameText.text = member.avatarName;
 
                 if (member.gamerTag == _beamContext.PlayerId)
                 {
-                    // Disable or hide the kick/ban buttons for the current user
+                    // Disable or hide the kick/ban/block buttons for the current user
                     kickButton.gameObject.SetActive(false);
                     banButton.gameObject.SetActive(false);
+                    blockButton.gameObject.SetActive(false);
                 }
                 else
                 {
                     kickButton.onClick.AddListener(() => KickMember(member.gamerTag, memberItem));
                     banButton.onClick.AddListener(() => BanMember(member.gamerTag, memberItem));
+                    blockButton.onClick.AddListener(() => BlockUser(member.gamerTag));
                 }
             }
         }
@@ -85,5 +98,19 @@ public class ManageRoomManager : MonoBehaviour
         {
             Debug.LogError($"Error banning member: {response.errorMessage}");
         }
+    }
+
+    private async void BlockUser(long blockedGamerTag)
+    {
+        var response = await _backendService.BlockUser(_beamContext.PlayerId, blockedGamerTag);
+        if (!response.data)
+        {
+            Debug.LogError($"Error blocking user: {response.errorMessage}");
+        }
+    }
+
+    public void GoBack()
+    {
+        SceneManager.LoadScene("ChatRoom");
     }
 }

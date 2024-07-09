@@ -24,6 +24,8 @@ public class ChatRoom : MonoBehaviour
     [SerializeField]
     private TMP_InputField messageInput;
 
+    private HashSet<long> _blockedUsers;
+
     private async void Start()
     {
         _beamContext = await BeamContext.Default.Instance;
@@ -35,11 +37,22 @@ public class ChatRoom : MonoBehaviour
         _roomName = PlayerPrefs.GetString("SelectedRoomName", string.Empty);
         roomNameText.text = _roomName;
 
+        var blockedUsersResponse = await _backendService.GetBlockedUsers(_beamContext.PlayerId);
+        if (blockedUsersResponse.data != null)
+        {
+            _blockedUsers = new HashSet<long>(blockedUsersResponse.data);
+        }
+        else
+        {
+            Debug.LogError($"Error loading blocked users: {blockedUsersResponse.errorMessage}");
+            _blockedUsers = new HashSet<long>();
+        }
+
         await JoinRoom(_beamContext.PlayerId, _roomName);
 
         _beamContext.Api.NotificationService.Subscribe(_roomName, HandleNotification);
         
-        LoadChatHistory(); 
+        await LoadChatHistory();
     }
 
     private async Task JoinRoom(long gamerTag, string roomName)
@@ -51,7 +64,7 @@ public class ChatRoom : MonoBehaviour
         }
     }
 
-    private async void LoadChatHistory()
+    private async Task LoadChatHistory()
     {
         chatLogText.text = "";
         var response = await _backendService.GetRoomHistory(_roomName);
@@ -63,6 +76,8 @@ public class ChatRoom : MonoBehaviour
 
         foreach (var message in response.data)
         {
+            if (_blockedUsers.Contains(message.senderGamerTag)) continue;
+
             var username = await _backendService.GetPlayerAvatarName(message.senderGamerTag);
             string roomMessage = $"{username.data}: {message.content}";
             chatLogText.text += $"{roomMessage}\n";
@@ -156,6 +171,8 @@ public class ChatRoom : MonoBehaviour
 
     private async Task UpdateChatLog(MessageData message)
     {
+        if (_blockedUsers.Contains(message.senderGamerTag)) return;
+
         var usernameResponse = await _backendService.GetPlayerAvatarName(message.senderGamerTag);
         var roomMessage = $"{usernameResponse.data}: {message.content}";
         chatLogText.text += $"{roomMessage}\n";

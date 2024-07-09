@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MembersScene.unity
     guid: 0ae3b34d04806aa45a167efd5c69874f
+  - enabled: 1
+    path: Assets/Scenes/BlockedPlayers.unity
+    guid: 2d5355b202a500e4db57253045a58ea5
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 2f2a4016e8699f643985cefdf358c1f4, type: 2}
