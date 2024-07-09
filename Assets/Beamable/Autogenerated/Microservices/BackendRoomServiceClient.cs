@@ -162,6 +162,34 @@ namespace Beamable.Server.Clients
             serializedFields.Add("roomName", raw_roomName);
             return this.Request<Beamable.Common.Utils.Response<bool>>("BackendRoomService", "KickMember", serializedFields);
         }
+        
+        /// <summary>
+        /// Call the BanMember method on the BackendRoomService microservice
+        /// <see cref="Beamable.Microservices.BackendRoomService.BanMember"/>
+        /// </summary>
+        public Beamable.Common.Promise<Beamable.Common.Utils.Response<bool>> BanMember(long gamerTag, string roomName)
+        {
+            object raw_gamerTag = gamerTag;
+            object raw_roomName = roomName;
+            System.Collections.Generic.Dictionary<string, object> serializedFields = new System.Collections.Generic.Dictionary<string, object>();
+            serializedFields.Add("gamerTag", raw_gamerTag);
+            serializedFields.Add("roomName", raw_roomName);
+            return this.Request<Beamable.Common.Utils.Response<bool>>("BackendRoomService", "BanMember", serializedFields);
+        }
+        
+        /// <summary>
+        /// Call the UnbanMember method on the BackendRoomService microservice
+        /// <see cref="Beamable.Microservices.BackendRoomService.UnbanMember"/>
+        /// </summary>
+        public Beamable.Common.Promise<Beamable.Common.Utils.Response<bool>> UnbanMember(long gamerTag, string roomName)
+        {
+            object raw_gamerTag = gamerTag;
+            object raw_roomName = roomName;
+            System.Collections.Generic.Dictionary<string, object> serializedFields = new System.Collections.Generic.Dictionary<string, object>();
+            serializedFields.Add("gamerTag", raw_gamerTag);
+            serializedFields.Add("roomName", raw_roomName);
+            return this.Request<Beamable.Common.Utils.Response<bool>>("BackendRoomService", "UnbanMember", serializedFields);
+        }
     }
     
     internal sealed class MicroserviceParametersBackendRoomServiceClient
