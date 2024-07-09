@@ -190,6 +190,46 @@ namespace Beamable.Server.Clients
             serializedFields.Add("roomName", raw_roomName);
             return this.Request<Beamable.Common.Utils.Response<bool>>("BackendRoomService", "UnbanMember", serializedFields);
         }
+        
+        /// <summary>
+        /// Call the BlockUser method on the BackendRoomService microservice
+        /// <see cref="Beamable.Microservices.BackendRoomService.BlockUser"/>
+        /// </summary>
+        public Beamable.Common.Promise<Beamable.Common.Utils.Response<bool>> BlockUser(long blockerGamerTag, long blockedGamerTag)
+        {
+            object raw_blockerGamerTag = blockerGamerTag;
+            object raw_blockedGamerTag = blockedGamerTag;
+            System.Collections.Generic.Dictionary<string, object> serializedFields = new System.Collections.Generic.Dictionary<string, object>();
+            serializedFields.Add("blockerGamerTag", raw_blockerGamerTag);
+            serializedFields.Add("blockedGamerTag", raw_blockedGamerTag);
+            return this.Request<Beamable.Common.Utils.Response<bool>>("BackendRoomService", "BlockUser", serializedFields);
+        }
+        
+        /// <summary>
+        /// Call the UnblockUser method on the BackendRoomService microservice
+        /// <see cref="Beamable.Microservices.BackendRoomService.UnblockUser"/>
+        /// </summary>
+        public Beamable.Common.Promise<Beamable.Common.Utils.Response<bool>> UnblockUser(long blockerGamerTag, long blockedGamerTag)
+        {
+            object raw_blockerGamerTag = blockerGamerTag;
+            object raw_blockedGamerTag = blockedGamerTag;
+            System.Collections.Generic.Dictionary<string, object> serializedFields = new System.Collections.Generic.Dictionary<string, object>();
+            serializedFields.Add("blockerGamerTag", raw_blockerGamerTag);
+            serializedFields.Add("blockedGamerTag", raw_blockedGamerTag);
+            return this.Request<Beamable.Common.Utils.Response<bool>>("BackendRoomService", "UnblockUser", serializedFields);
+        }
+        
+        /// <summary>
+        /// Call the GetBlockedUsers method on the BackendRoomService microservice
+        /// <see cref="Beamable.Microservices.BackendRoomService.GetBlockedUsers"/>
+        /// </summary>
+        public Beamable.Common.Promise<Beamable.Common.Utils.Response<System.Collections.Generic.List<long>>> GetBlockedUsers(long gamerTag)
+        {
+            object raw_gamerTag = gamerTag;
+            System.Collections.Generic.Dictionary<string, object> serializedFields = new System.Collections.Generic.Dictionary<string, object>();
+            serializedFields.Add("gamerTag", raw_gamerTag);
+            return this.Request<Beamable.Common.Utils.Response<System.Collections.Generic.List<long>>>("BackendRoomService", "GetBlockedUsers", serializedFields);
+        }
     }
     
     internal sealed class MicroserviceParametersBackendRoomServiceClient

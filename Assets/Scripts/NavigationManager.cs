@@ -12,4 +12,9 @@ public class NavigationManager : MonoBehaviour
     {
         SceneManager.LoadScene("ChatRooms");
     }
+
+    public void LoadBlockedPlayers()
+    {
+        SceneManager.LoadScene("BlockedPlayers");
+    }
 }
