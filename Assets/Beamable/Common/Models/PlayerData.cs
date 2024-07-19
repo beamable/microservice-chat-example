@@ -10,7 +10,6 @@ namespace Beamable.Common.Models
     {
         public long gamerTag;
         public string avatarName;
-        public string fcmToken;
         public List<long> blockedGamerTags = new List<long>();
         public List<long> blockedByGamerTags = new List<long>();
 
@@ -18,7 +17,6 @@ namespace Beamable.Common.Models
         {
             gamerTag = document.gamerTag;
             avatarName = document.avatarName;
-            fcmToken = document.fcmToken;
             blockedGamerTags = document.blockedGamerTags;
             blockedByGamerTags = document.blockedByGamerTags;
         }
