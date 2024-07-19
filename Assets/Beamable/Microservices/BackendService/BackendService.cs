@@ -352,14 +352,25 @@ namespace Beamable.Microservices
             try
             {
                 var blockerData = await Storage.GetByFieldName<PlayerData, long>("gamerTag", blockerGamerTag);
-                if (blockerData == null)
+                var blockedData = await Storage.GetByFieldName<PlayerData, long>("gamerTag", blockedGamerTag);
+
+                if (blockerData == null || blockedData == null)
                 {
-                    return new Response<bool>(false, "Blocker user not found");
+                    return new Response<bool>(false, "Blocker or blocked user not found");
                 }
 
-                if (blockerData.blockedGamerTags.Contains(blockedGamerTag)) return new Response<bool>(true);
-                blockerData.blockedGamerTags.Add(blockedGamerTag);
+                if (!blockerData.blockedGamerTags.Contains(blockedGamerTag))
+                {
+                    blockerData.blockedGamerTags.Add(blockedGamerTag);
+                }
+
+                if (!blockedData.blockedByGamerTags.Contains(blockerGamerTag))
+                {
+                    blockedData.blockedByGamerTags.Add(blockerGamerTag);
+                }
+
                 await Storage.Update(blockerData.Id, blockerData);
+                await Storage.Update(blockedData.Id, blockedData);
 
                 return new Response<bool>(true);
             }
@@ -376,16 +387,25 @@ namespace Beamable.Microservices
             try
             {
                 var blockerData = await Storage.GetByFieldName<PlayerData, long>("gamerTag", blockerGamerTag);
-                if (blockerData == null)
+                var blockedData = await Storage.GetByFieldName<PlayerData, long>("gamerTag", blockedGamerTag);
+
+                if (blockerData == null || blockedData == null)
                 {
-                    return new Response<bool>(false, "Blocker user not found");
+                    return new Response<bool>(false, "Blocker or blocked user not found");
                 }
 
                 if (blockerData.blockedGamerTags.Contains(blockedGamerTag))
                 {
                     blockerData.blockedGamerTags.Remove(blockedGamerTag);
-                    await Storage.Update(blockerData.Id, blockerData);
                 }
+
+                if (blockedData.blockedByGamerTags.Contains(blockerGamerTag))
+                {
+                    blockedData.blockedByGamerTags.Remove(blockerGamerTag);
+                }
+
+                await Storage.Update(blockerData.Id, blockerData);
+                await Storage.Update(blockedData.Id, blockedData);
 
                 return new Response<bool>(true);
             }
@@ -405,6 +425,28 @@ namespace Beamable.Microservices
                 if (playerData.gamerTag > 0)
                 {
                     return new Response<List<long>>(playerData.blockedGamerTags);
+                }
+                else
+                {
+                    return new Response<List<long>>(new List<long>(), "User not found");
+                }
+            }
+            catch (Exception e)
+            {
+                BeamableLogger.LogError(e);
+                return new Response<List<long>>(new List<long>(), e.Message);
+            }
+        }
+        
+        [ClientCallable]
+        public async Promise<Response<List<long>>> GetBlockedByUsers(long gamerTag)
+        {
+            try
+            {
+                var playerData = await Storage.GetByFieldName<PlayerData, long>("gamerTag", gamerTag);
+                if (playerData.gamerTag > 0)
+                {
+                    return new Response<List<long>>(playerData.blockedByGamerTags);
                 }
                 else
                 {
