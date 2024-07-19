@@ -10,13 +10,17 @@ namespace Beamable.Common.Models
     {
         public long gamerTag;
         public string avatarName;
-        public List<long> blockedGamerTags = new List<long>(); // New list for blocked members
-        
+        public string fcmToken;
+        public List<long> blockedGamerTags = new List<long>();
+        public List<long> blockedByGamerTags = new List<long>();
+
         public void Set(PlayerData document)
         {
             gamerTag = document.gamerTag;
             avatarName = document.avatarName;
+            fcmToken = document.fcmToken;
             blockedGamerTags = document.blockedGamerTags;
+            blockedByGamerTags = document.blockedByGamerTags;
         }
     }
 }

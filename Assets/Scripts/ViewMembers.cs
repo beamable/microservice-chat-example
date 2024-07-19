@@ -31,16 +31,24 @@ public class ViewMembers : MonoBehaviour
 
     private async Task LoadRoomMembers()
     {
+        // Clear existing members
+        foreach (Transform child in membersContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
         var response = await _backendService.GetRoomMembers(_roomName);
         var blockedUsersResponse = await _backendService.GetBlockedUsers(_beamContext.PlayerId);
+        var blockedByUsersResponse = await _backendService.GetBlockedByUsers(_beamContext.PlayerId);
 
         if (response.data != null && response.data.Count > 0)
         {
             var blockedUsers = new HashSet<long>(blockedUsersResponse.data);
+            var blockedByUsers = new HashSet<long>(blockedByUsersResponse.data);
 
             foreach (var member in response.data)
             {
-                if (blockedUsers.Contains(member.gamerTag))
+                if (blockedUsers.Contains(member.gamerTag) || blockedByUsers.Contains(member.gamerTag))
                 {
                     continue; // Skip blocked users
                 }
@@ -102,8 +110,13 @@ public class ViewMembers : MonoBehaviour
 
     private async void BlockUser(long blockedGamerTag)
     {
+        Debug.Log("Clicked on block");
         var response = await _backendService.BlockUser(_beamContext.PlayerId, blockedGamerTag);
-        if (!response.data)
+        if (response.data)
+        {
+            await LoadRoomMembers(); // Refresh the members list after blocking a user
+        }
+        else
         {
             Debug.LogError($"Error blocking user: {response.errorMessage}");
         }
